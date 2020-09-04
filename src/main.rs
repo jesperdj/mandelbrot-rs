@@ -12,16 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#![allow(dead_code)]
+
 use image::{Rgb, RgbImage};
 use num_complex::Complex64;
 use renderbase::filter::MitchellFilter;
 use renderbase::renderer::render;
 use renderbase::sampler::StratifiedSampler;
 
+// use crate::julia::JuliaRenderFunction;
 use crate::mandelbrot::MandelbrotRenderFunction;
 use crate::palette::{Palette, PaletteEntry, TablePalette};
 
 mod mandelbrot;
+mod julia;
 mod palette;
 
 fn main() {
@@ -37,6 +41,7 @@ fn main() {
     // Setup sampler, render function and filter
     let sampler = StratifiedSampler::new(width * oversampling, height * oversampling, true);
     let render_fn = MandelbrotRenderFunction::new(Complex64::new(-0.743643, 0.131825), 0.00006, 10_000, width as f64 / height as f64);
+    // let render_fn = JuliaRenderFunction::new(Complex64::new(-0.4, -0.59), Complex64::new(0.0, 0.0), 2.0, 10_000, width as f64 / height as f64);
     let filter = MitchellFilter::with_defaults();
 
     // Render a raster using the sampler, render function and filter
