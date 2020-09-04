@@ -3,11 +3,13 @@ name = "mandelbrot"
 version = "0.1.0"
 authors = ["Jesper de Jong <jespdj@gmail.com>"]
 edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "Mandelbrot and Julia fractal renderer using RenderBase."
+readme = "README.md"
+repository = "https://github.com/jesperdj/mandelbrot-rs"
+license-file = "LICENSE"
 
 [dependencies]
-renderbase = { path = "../renderbase" }
+renderbase = { git = "https://github.com/jesperdj/renderbase-rs" }
 log = "0.4.11"
 env_logger = "0.7.1"
 num-complex = "0.3.0"
