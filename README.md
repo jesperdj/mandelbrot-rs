@@ -58,3 +58,7 @@ The above command will produce output that looks like the following. The number 
 [2020-09-04T21:44:52.546122Z INFO  renderbase::renderer] Rendering finished, run time: 9498 ms
 105072K 0:09.84
 ```
+
+This will produce an image like this:
+
+![Mandelbrot detail](doc/mandelbrot.png)
