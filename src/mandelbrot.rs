@@ -62,6 +62,8 @@ impl RenderFunction<f32> for MandelbrotRenderFunction {
             i += 1;
         }
 
+        // TODO: https://blogen.pasithee.fr/2019/01/06/smooth-coloring-of-mandelbrot/ and http://linas.org/art-gallery/escape/escape.html
+
         if i < self.max_iterations {
             ((i as f64 - z.norm().log2().log2()) / (self.max_iterations as f64)) as f32
         } else {

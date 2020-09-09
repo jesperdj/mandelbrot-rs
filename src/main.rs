@@ -34,13 +34,19 @@ fn main() {
 
     let (width, height) = (3840, 2160);
     let oversampling = 4;
+    let jitter = true;
     log::info!("Size:                    {} x {}", width, height);
     log::info!("Samples per pixel:       {}", oversampling * oversampling);
     log::info!("Total number of samples: {}", width as usize * oversampling as usize * height as usize * oversampling as usize);
 
+    // Mandelbrot parameters
+    let center = Complex64::new(-0.743643, 0.131825);
+    let scale = 0.00006;
+    let max_iterations = 10_000;
+
     // Setup sampler, render function and filter
-    let sampler = StratifiedSampler::new(width * oversampling, height * oversampling, true);
-    let render_fn = MandelbrotRenderFunction::new(Complex64::new(-0.743643, 0.131825), 0.00006, 10_000, width as f64 / height as f64);
+    let sampler = StratifiedSampler::new(width * oversampling, height * oversampling, jitter);
+    let render_fn = MandelbrotRenderFunction::new(center, scale, max_iterations, width as f64 / height as f64);
     // let render_fn = JuliaRenderFunction::new(Complex64::new(-0.4, -0.59), Complex64::new(0.0, 0.0), 2.0, 10_000, width as f64 / height as f64);
     let filter = MitchellFilter::with_defaults();
 
