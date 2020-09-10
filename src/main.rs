@@ -17,6 +17,7 @@
 use image::{Rgb, RgbImage};
 use num_complex::Complex64;
 use renderbase::filter::MitchellFilter;
+use renderbase::rectangle::Rectangle;
 use renderbase::renderer::render;
 use renderbase::sampler::StratifiedSampler;
 
@@ -45,13 +46,13 @@ fn main() {
     let max_iterations = 10_000;
 
     // Setup sampler, render function and filter
-    let sampler = StratifiedSampler::new(width * oversampling, height * oversampling, jitter);
-    let render_fn = MandelbrotRenderFunction::new(center, scale, max_iterations, width as f64 / height as f64);
-    // let render_fn = JuliaRenderFunction::new(Complex64::new(-0.4, -0.59), Complex64::new(0.0, 0.0), 2.0, 10_000, width as f64 / height as f64);
+    let sampler = StratifiedSampler::new(Rectangle::new(0, 0, width, height), oversampling, jitter);
+    let render_fn = MandelbrotRenderFunction::new(center, scale, max_iterations, width, height);
+    // let render_fn = JuliaRenderFunction::new(Complex64::new(-0.4, -0.59), Complex64::new(0.0, 0.0), 2.0, 10_000, width, height);
     let filter = MitchellFilter::with_defaults();
 
     // Render a raster using the sampler, render function and filter
-    let raster = render(&sampler, &render_fn, &filter, width, height);
+    let raster = render(&sampler, &render_fn, &filter);
 
     let palette = TablePalette::new(vec![
         PaletteEntry::new(0.000, Rgb([0x00, 0x00, 0x66])),

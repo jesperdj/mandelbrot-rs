@@ -14,6 +14,7 @@
 
 use num_complex::Complex64;
 use renderbase::renderer::RenderFunction;
+use renderbase::sampler::PixelSample;
 
 /// Julia fractal render function.
 pub struct JuliaRenderFunction {
@@ -28,7 +29,8 @@ pub struct JuliaRenderFunction {
 // ===== JuliaRenderFunction ===================================================================================================================================
 
 impl JuliaRenderFunction {
-    pub fn new(c: Complex64, center: Complex64, scale: f64, max_iterations: usize, aspect_ratio: f64) -> JuliaRenderFunction {
+    pub fn new(c: Complex64, center: Complex64, scale: f64, max_iterations: usize, width: u32, height: u32) -> JuliaRenderFunction {
+        let aspect_ratio = width as f64 / height as f64;
         let (aspect_x, aspect_y) = if aspect_ratio >= 1.0 {
             (1.0, 1.0 / aspect_ratio)
         } else {
@@ -41,18 +43,20 @@ impl JuliaRenderFunction {
         let offset_re = min_z.re;
         let offset_im = max_z.im;
 
-        let scale_re = max_z.re - min_z.re;
-        let scale_im = max_z.im - min_z.im;
+        let scale_re = (max_z.re - min_z.re) / width as f64;
+        let scale_im = (max_z.im - min_z.im) / height as f64;
 
         JuliaRenderFunction { c, offset_re, offset_im, scale_re, scale_im, max_iterations }
     }
 }
 
-impl RenderFunction<f32> for JuliaRenderFunction {
-    fn evaluate(&self, x: f32, y: f32) -> f32 {
+impl RenderFunction for JuliaRenderFunction {
+    type Value = f32;
+
+    fn evaluate(&self, sample: &PixelSample) -> f32 {
         let mut z = Complex64::new(
-            self.offset_re + x as f64 * self.scale_re,
-            self.offset_im - y as f64 * self.scale_im,
+            self.offset_re + sample.pixel_x as f64 * self.scale_re,
+            self.offset_im - sample.pixel_y as f64 * self.scale_im,
         );
 
         let mut i = 0;

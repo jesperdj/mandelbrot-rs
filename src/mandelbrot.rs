@@ -14,6 +14,7 @@
 
 use num_complex::Complex64;
 use renderbase::renderer::RenderFunction;
+use renderbase::sampler::PixelSample;
 
 /// Mandelbrot fractal render function.
 pub struct MandelbrotRenderFunction {
@@ -27,7 +28,8 @@ pub struct MandelbrotRenderFunction {
 // ===== MandelbrotRenderFunction ==============================================================================================================================
 
 impl MandelbrotRenderFunction {
-    pub fn new(center: Complex64, scale: f64, max_iterations: usize, aspect_ratio: f64) -> MandelbrotRenderFunction {
+    pub fn new(center: Complex64, scale: f64, max_iterations: usize, width: u32, height: u32) -> MandelbrotRenderFunction {
+        let aspect_ratio = width as f64 / height as f64;
         let (aspect_x, aspect_y) = if aspect_ratio >= 1.0 {
             (1.0, 1.0 / aspect_ratio)
         } else {
@@ -40,18 +42,20 @@ impl MandelbrotRenderFunction {
         let offset_re = min_c.re;
         let offset_im = max_c.im;
 
-        let scale_re = max_c.re - min_c.re;
-        let scale_im = max_c.im - min_c.im;
+        let scale_re = (max_c.re - min_c.re) / width as f64;
+        let scale_im = (max_c.im - min_c.im) / height as f64;
 
         MandelbrotRenderFunction { offset_re, offset_im, scale_re, scale_im, max_iterations }
     }
 }
 
-impl RenderFunction<f32> for MandelbrotRenderFunction {
-    fn evaluate(&self, x: f32, y: f32) -> f32 {
+impl RenderFunction for MandelbrotRenderFunction {
+    type Value = f32;
+
+    fn evaluate(&self, sample: &PixelSample) -> f32 {
         let c = Complex64::new(
-            self.offset_re + x as f64 * self.scale_re,
-            self.offset_im - y as f64 * self.scale_im,
+            self.offset_re + sample.pixel_x as f64 * self.scale_re,
+            self.offset_im - sample.pixel_y as f64 * self.scale_im,
         );
 
         let mut z = Complex64::new(0.0, 0.0);
