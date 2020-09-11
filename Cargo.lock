@@ -462,7 +462,7 @@ checksum = "26412eb97c6b088a6997e05f69403a802a92d520de2f8e63c2b65f9e0f47c4e8"
 [[package]]
 name = "renderbase"
 version = "0.1.0"
-source = "git+https://github.com/jesperdj/renderbase-rs#5d958376b37fef83a80953ada8e5c8e099825a7c"
+source = "git+https://github.com/jesperdj/renderbase-rs#47304e57b9de5877a775eafb6967412ea8c8cf53"
 dependencies = [
  "crossbeam-channel",
  "crossbeam-utils",

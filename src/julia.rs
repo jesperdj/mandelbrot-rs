@@ -54,11 +54,11 @@ impl RenderFunction for JuliaRenderFunction {
     type Value = f32;
 
     fn evaluate(&self, sample: &PixelSample) -> f32 {
-        let (sample_x, sample_y) = (sample.pixel_x as f64 + sample.pixel_offset_x as f64, sample.pixel_y as f64 + sample.pixel_offset_y as f64);
+        let (sample_x, sample_y) = sample.sample();
 
         let mut z = Complex64::new(
-            self.offset_re + sample_x * self.scale_re,
-            self.offset_im - sample_y * self.scale_im,
+            self.offset_re + sample_x as f64 * self.scale_re,
+            self.offset_im - sample_y as f64 * self.scale_im,
         );
 
         let mut i = 0;
