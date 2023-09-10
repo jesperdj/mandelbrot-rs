@@ -34,11 +34,11 @@ fn main() {
     env_logger::builder().format_timestamp_micros().init();
 
     let (width, height) = (3840, 2160);
-    let oversampling = 4;
+    let samples_per_pixel = 16;
     let jitter = true;
     log::info!("Size:                    {} x {}", width, height);
-    log::info!("Samples per pixel:       {}", oversampling * oversampling);
-    log::info!("Total number of samples: {}", width as usize * oversampling as usize * height as usize * oversampling as usize);
+    log::info!("Samples per pixel:       {}", samples_per_pixel);
+    log::info!("Total number of samples: {}", width as usize * height as usize * samples_per_pixel as usize);
 
     // Mandelbrot parameters
     let center = Complex64::new(-0.743643, 0.131825);
@@ -50,7 +50,8 @@ fn main() {
     // let renderer = SimpleRenderer::new();
 
     // Setup sampler, render function and filter
-    let sampler = StratifiedSampler::new(Rectangle::new(0, 0, width, height), oversampling, jitter);
+    let sampler = StratifiedSampler::new(Rectangle::new(0, 0, width, height), f64::sqrt(samples_per_pixel as f64) as u32, jitter);
+    // let sampler = IndependentSampler::new(Rectangle::new(0, 0, width, height), samples_per_pixel, jitter);
     let render_fn = MandelbrotRenderFunction::new(center, scale, max_iterations, width, height);
     // let render_fn = JuliaRenderFunction::new(Complex64::new(-0.4, -0.59), Complex64::new(0.0, 0.0), 2.0, 10_000, width, height);
     let filter = MitchellFilter::with_defaults();
@@ -72,8 +73,7 @@ fn main() {
     // Convert the raster into an image
     let mut image = RgbImage::new(width, height);
     for (x, y) in raster.rectangle().index_iter() {
-        let value = raster.get(x, y);
-        image.put_pixel(x as u32, y as u32, palette.evaluate(value));
+        image.put_pixel(x, y, palette.evaluate(raster.get(x, y)));
     }
 
     image.save("mandelbrot.png").unwrap();

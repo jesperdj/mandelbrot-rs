@@ -34,8 +34,7 @@ pub struct TablePalette {
 /// Grayscale palette. Converts values in the range 0..1 into a grayscale color.
 pub struct Grayscale;
 
-/// Rainbow palette. Converts values in the range 0..1 into a color that varies from blue to cyan, green, yellow, red,
-/// magenta.
+/// Rainbow palette. Converts values in the range 0..1 into a color that varies from blue to cyan, green, yellow, red, magenta.
 pub struct Rainbow;
 
 // ===== PaletteEntry ==========================================================================================================================================
@@ -50,7 +49,7 @@ impl PaletteEntry {
 
 impl TablePalette {
     pub fn new(mut entries: Vec<PaletteEntry>) -> TablePalette {
-        assert!(!entries.is_empty(), "entries must not be empty");
+        debug_assert!(!entries.is_empty(), "entries must not be empty");
         entries.sort_by(|a, b| a.stop.partial_cmp(&b.stop).unwrap());
         TablePalette { entries }
     }
