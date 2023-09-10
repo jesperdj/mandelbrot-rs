@@ -47,6 +47,7 @@ fn main() {
 
     // Create renderer
     let renderer = MultiThreadedRenderer::with_defaults();
+    // let renderer = SimpleRenderer::new();
 
     // Setup sampler, render function and filter
     let sampler = StratifiedSampler::new(Rectangle::new(0, 0, width, height), oversampling, jitter);
