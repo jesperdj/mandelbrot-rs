@@ -38,10 +38,7 @@ where
 {
     #[inline]
     pub fn new(filter: &'a F) -> Reconstructor<R, F> {
-        let accumulator = R::default();
-        let total_weight = 0.0;
-
-        Reconstructor { accumulator, total_weight, filter }
+        Reconstructor { accumulator: R::default(), total_weight: 0.0, filter }
     }
 
     #[inline]
