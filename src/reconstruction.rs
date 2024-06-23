@@ -56,7 +56,7 @@ where
     }
 
     #[inline]
-    pub fn value(&self) -> R {
+    pub fn value(self) -> R {
         if self.total_weight != 0.0 { self.accumulator / self.total_weight } else { R::default() }
     }
 }
