@@ -16,6 +16,8 @@ use crate::sampling::Sample;
 
 pub mod mandelbrot;
 
-pub trait Renderer<R> {
-    fn render(&self, sample: &Sample) -> R;
+pub trait Renderer {
+    type Result;
+
+    fn render(&self, sample: &Sample) -> Self::Result;
 }

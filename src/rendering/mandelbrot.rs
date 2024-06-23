@@ -45,8 +45,10 @@ impl MandelbrotRenderer {
     }
 }
 
-impl Renderer<f64> for MandelbrotRenderer {
-    fn render(&self, sample: &Sample) -> f64 {
+impl Renderer for MandelbrotRenderer {
+    type Result = f64;
+
+    fn render(&self, sample: &Sample) -> Self::Result {
         let (x, y) = sample.location();
         let c = Complex64::new(self.offset_re + x * self.scale_re, self.offset_im - y * self.scale_im);
 

@@ -14,11 +14,11 @@
 
 use std::iter::FusedIterator;
 
-use crate::sampling::{Sample, Sampler};
+use crate::sampling::Sample;
 
 pub struct SimpleSampler {
-    x: u32,
-    y: u32,
+    pixel_x: u32,
+    pixel_y: u32,
     fresh: bool,
 }
 
@@ -26,12 +26,10 @@ pub struct SimpleSampler {
 
 impl SimpleSampler {
     #[inline]
-    pub fn new(x: u32, y: u32) -> SimpleSampler {
-        SimpleSampler { x, y, fresh: true }
+    pub fn new(pixel_x: u32, pixel_y: u32) -> SimpleSampler {
+        SimpleSampler { pixel_x, pixel_y, fresh: true }
     }
 }
-
-impl Sampler for SimpleSampler {}
 
 impl Iterator for SimpleSampler {
     type Item = Sample;
@@ -40,7 +38,7 @@ impl Iterator for SimpleSampler {
     fn next(&mut self) -> Option<Self::Item> {
         if self.fresh {
             self.fresh = false;
-            Some(Sample::new(self.x, self.y, 0.5, 0.5))
+            Some(Sample::new(self.pixel_x, self.pixel_y, 0.5, 0.5))
         } else {
             None
         }

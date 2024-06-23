@@ -16,11 +16,11 @@ use std::iter::FusedIterator;
 
 use rand::random;
 
-use crate::sampling::{Sample, Sampler};
+use crate::sampling::Sample;
 
 pub struct StratifiedSampler {
-    x: u32,
-    y: u32,
+    pixel_x: u32,
+    pixel_y: u32,
     samples_per_pixel_x: u32,
     samples_per_pixel_y: u32,
     jitter: bool,
@@ -31,15 +31,13 @@ pub struct StratifiedSampler {
 // ===== StratifiedSampler =====================================================================================================================================
 
 impl StratifiedSampler {
-    pub fn new(x: u32, y: u32, samples_per_pixel: u32, jitter: bool) -> StratifiedSampler {
+    pub fn new(pixel_x: u32, pixel_y: u32, samples_per_pixel: u32, jitter: bool) -> StratifiedSampler {
         let samples_per_pixel_x = f32::sqrt(samples_per_pixel as f32).round() as u32;
         let samples_per_pixel_y = samples_per_pixel / samples_per_pixel_x;
 
-        StratifiedSampler { x, y, samples_per_pixel_x, samples_per_pixel_y, jitter, index_x: 0, index_y: 0 }
+        StratifiedSampler { pixel_x, pixel_y, samples_per_pixel_x, samples_per_pixel_y, jitter, index_x: 0, index_y: 0 }
     }
 }
-
-impl Sampler for StratifiedSampler {}
 
 impl Iterator for StratifiedSampler {
     type Item = Sample;
@@ -49,7 +47,7 @@ impl Iterator for StratifiedSampler {
             let (jitter_x, jitter_y) = if self.jitter { random() } else { (0.5, 0.5) };
             let offset_x = (self.index_x as f64 + jitter_x) / self.samples_per_pixel_x as f64;
             let offset_y = (self.index_y as f64 + jitter_y) / self.samples_per_pixel_y as f64;
-            let sample = Sample::new(self.x, self.y, offset_x, offset_y);
+            let sample = Sample::new(self.pixel_x, self.pixel_y, offset_x, offset_y);
 
             self.index_x += 1;
             if self.index_x >= self.samples_per_pixel_x {

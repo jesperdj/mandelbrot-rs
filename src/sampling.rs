@@ -15,7 +15,6 @@
 pub mod simple;
 pub mod stratified;
 
-#[derive(Clone)]
 pub struct Sample {
     pub pixel_x: u32,
     pub pixel_y: u32,
@@ -38,3 +37,7 @@ impl Sample {
         (self.pixel_x as f64 + self.offset_x, self.pixel_y as f64 + self.offset_y)
     }
 }
+
+// ===== Sampler ===============================================================================================================================================
+
+impl<T: Iterator<Item=Sample>> Sampler for T {}

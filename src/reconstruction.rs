@@ -19,9 +19,11 @@ use crate::sampling::Sample;
 
 pub mod filter;
 
+pub trait RenderResult: Copy + Default + AddAssign + Mul<f64, Output=Self> + Div<f64, Output=Self> {}
+
 pub struct Reconstructor<'a, R, F>
 where
-    R: Copy + Default + AddAssign + Mul<f64, Output=R> + Div<f64, Output=R>,
+    R: RenderResult,
     F: Filter,
 {
     accumulator: R,
@@ -29,11 +31,15 @@ where
     filter: &'a F,
 }
 
+// ===== RenderResult ==========================================================================================================================================
+
+impl<T: Copy + Default + AddAssign + Mul<f64, Output=Self> + Div<f64, Output=Self>> RenderResult for T {}
+
 // ===== Reconstructor =========================================================================================================================================
 
 impl<'a, R, F> Reconstructor<'a, R, F>
 where
-    R: Copy + Default + AddAssign + Mul<f64, Output=R> + Div<f64, Output=R>,
+    R: RenderResult,
     F: Filter,
 {
     #[inline]

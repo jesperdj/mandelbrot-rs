@@ -14,15 +14,14 @@
 
 #![allow(dead_code)]
 
-use std::ops::{AddAssign, Div, Mul};
 use std::time::Instant;
 
 use image::{Rgb, RgbImage};
 use num_complex::Complex64;
 
 use crate::palette::{Entry, Palette, TablePalette};
+use crate::reconstruction::{Reconstructor, RenderResult};
 use crate::reconstruction::filter::{Filter, MitchellFilter};
-use crate::reconstruction::Reconstructor;
 use crate::rendering::mandelbrot::MandelbrotRenderer;
 use crate::rendering::Renderer;
 use crate::sampling::Sampler;
@@ -74,8 +73,8 @@ fn render_image<SF, S, R, RR, F, M>(sampler_factory: &SF, renderer: &R, filter: 
 where
     SF: Fn(u32, u32) -> S + Sync,
     S: Sampler,
-    R: Renderer<RR> + Sync,
-    RR: Copy + Default + AddAssign + Mul<f64, Output=RR> + Div<f64, Output=RR>,
+    R: Renderer<Result=RR> + Sync,
+    RR: RenderResult,
     F: Filter + Sync,
     M: Fn(RR) -> Rgb<u8> + Sync,
 {
