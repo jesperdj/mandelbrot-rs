@@ -49,7 +49,8 @@ where
 
     #[inline]
     pub fn accumulate(&mut self, sample: &Sample, result: R) {
-        let weight = self.filter.evaluate(sample.offset_x - 0.5, sample.offset_y - 0.5);
+        let (offset_x, offset_y) = sample.offset();
+        let weight = self.filter.evaluate(offset_x - 0.5, offset_y - 0.5);
         self.accumulator += result * weight;
         self.total_weight += weight;
     }

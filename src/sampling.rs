@@ -16,10 +16,10 @@ pub mod simple;
 pub mod stratified;
 
 pub struct Sample {
-    pub pixel_x: u32,
-    pub pixel_y: u32,
-    pub offset_x: f64,
-    pub offset_y: f64,
+    pixel_x: u32,
+    pixel_y: u32,
+    offset_x: f64,
+    offset_y: f64,
 }
 
 pub trait Sampler: Iterator<Item=Sample> {}
@@ -30,6 +30,16 @@ impl Sample {
     #[inline]
     pub fn new(pixel_x: u32, pixel_y: u32, offset_x: f64, offset_y: f64) -> Sample {
         Sample { pixel_x, pixel_y, offset_x, offset_y }
+    }
+
+    #[inline]
+    pub fn pixel(&self) -> (u32, u32) {
+        (self.pixel_x, self.pixel_y)
+    }
+
+    #[inline]
+    pub fn offset(&self) -> (f64, f64) {
+        (self.offset_x, self.offset_y)
     }
 
     #[inline]
