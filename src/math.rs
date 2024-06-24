@@ -17,18 +17,10 @@ use std::ops::{Add, Mul};
 use num_traits::Num;
 
 #[inline]
-pub fn clamp<T>(value: T, min: T, max: T) -> T
-where
-    T: Copy + PartialOrd,
-{
-    if value < min { min } else if value > max { max } else { value }
-}
-
-#[inline]
 pub fn interpolate<T, U>(value: T, left: U, right: U) -> U
 where
     T: Copy + Num,
-    U: Copy + Mul<T, Output=U> + Add<Output=U>,
+    U: Mul<T, Output=U> + Add<Output=U>,
 {
     left * (T::one() - value) + right * value
 }

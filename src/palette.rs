@@ -16,7 +16,6 @@ use std::ops::Range;
 
 use image::Rgb;
 
-use crate::math::clamp;
 use crate::math::interpolate;
 
 pub trait Palette {
@@ -128,9 +127,9 @@ impl Palette for TablePalette {
             let right = &self.entries[index];
             let value = (value - left.value) / (right.value - left.value);
 
-            let r = clamp(interpolate(value, left.color[0] as f64, right.color[0] as f64), 0.0, 255.0).round() as u8;
-            let g = clamp(interpolate(value, left.color[1] as f64, right.color[1] as f64), 0.0, 255.0).round() as u8;
-            let b = clamp(interpolate(value, left.color[2] as f64, right.color[2] as f64), 0.0, 255.0).round() as u8;
+            let r = interpolate(value, left.color[0] as f64, right.color[0] as f64).clamp(0.0, 255.0).round() as u8;
+            let g = interpolate(value, left.color[1] as f64, right.color[1] as f64).clamp(0.0, 255.0).round() as u8;
+            let b = interpolate(value, left.color[2] as f64, right.color[2] as f64).clamp(0.0, 255.0).round() as u8;
 
             Rgb([r, g, b])
         } else {
