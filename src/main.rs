@@ -20,7 +20,7 @@ use image::{Rgb, RgbImage};
 use num_complex::Complex64;
 
 use crate::palette::{Entry, Palette, TablePalette};
-use crate::reconstruction::{Reconstructor, RenderResult};
+use crate::reconstruction::{Reconstructor, RendererOutput};
 use crate::reconstruction::filter::{Filter, MitchellFilter};
 use crate::rendering::mandelbrot::MandelbrotRenderer;
 use crate::rendering::Renderer;
@@ -63,18 +63,18 @@ fn main() {
     let filter = MitchellFilter::with_defaults();
     // let filter = BoxFilter::with_defaults();
 
-    let result_to_color = |value| palette.evaluate(value);
+    let value_to_color = |value| palette.evaluate(value);
 
-    let image = render_image(&sampler_factory, &renderer, &filter, &result_to_color, width, height);
+    let image = render_image(&sampler_factory, &renderer, &filter, &value_to_color, width, height);
     image.save("mandelbrot.png").unwrap();
 }
 
-fn render_image<SF, S, R, RR, F, M>(sampler_factory: &SF, renderer: &R, filter: &F, result_to_color: &M, width: u32, height: u32) -> RgbImage
+fn render_image<SF, S, R, RR, F, M>(sampler_factory: &SF, renderer: &R, filter: &F, value_to_color: &M, width: u32, height: u32) -> RgbImage
 where
     SF: Fn(u32, u32) -> S + Sync,
     S: Sampler,
-    R: Renderer<Result=RR> + Sync,
-    RR: RenderResult,
+    R: Renderer<Output=RR> + Sync,
+    RR: RendererOutput,
     F: Filter + Sync,
     M: Fn(RR) -> Rgb<u8> + Sync,
 {
@@ -84,11 +84,11 @@ where
         let mut reconstructor = Reconstructor::new(filter);
 
         for sample in sampler {
-            let result = renderer.render(&sample);
-            reconstructor.accumulate(&sample, result);
+            let value = renderer.render(&sample);
+            reconstructor.accumulate(&sample, value);
         }
 
-        result_to_color(reconstructor.value())
+        value_to_color(reconstructor.value())
     });
     let duration = Instant::now().duration_since(start_time).as_millis();
     println!("Rendering time: {} ms", duration);

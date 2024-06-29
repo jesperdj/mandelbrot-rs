@@ -19,11 +19,11 @@ use crate::sampling::Sample;
 
 pub mod filter;
 
-pub trait RenderResult: Copy + Default + AddAssign + Mul<f64, Output=Self> + Div<f64, Output=Self> {}
+pub trait RendererOutput: Copy + Default + AddAssign + Mul<f64, Output=Self> + Div<f64, Output=Self> {}
 
 pub struct Reconstructor<'a, R, F>
 where
-    R: RenderResult,
+    R: RendererOutput,
     F: Filter,
 {
     accumulator: R,
@@ -31,15 +31,15 @@ where
     filter: &'a F,
 }
 
-// ===== RenderResult ==========================================================================================================================================
+// ===== RendererOutput ========================================================================================================================================
 
-impl<T: Copy + Default + AddAssign + Mul<f64, Output=Self> + Div<f64, Output=Self>> RenderResult for T {}
+impl<T: Copy + Default + AddAssign + Mul<f64, Output=Self> + Div<f64, Output=Self>> RendererOutput for T {}
 
 // ===== Reconstructor =========================================================================================================================================
 
 impl<'a, R, F> Reconstructor<'a, R, F>
 where
-    R: RenderResult,
+    R: RendererOutput,
     F: Filter,
 {
     #[inline]
@@ -48,10 +48,10 @@ where
     }
 
     #[inline]
-    pub fn accumulate(&mut self, sample: &Sample, result: R) {
+    pub fn accumulate(&mut self, sample: &Sample, value: R) {
         let (offset_x, offset_y) = sample.offset();
         let weight = self.filter.evaluate(offset_x - 0.5, offset_y - 0.5);
-        self.accumulator += result * weight;
+        self.accumulator += value * weight;
         self.total_weight += weight;
     }
 
