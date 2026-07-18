@@ -44,27 +44,27 @@ mod rendering;
 #[command(version, about)]
 struct Args {
     /// Image width in pixels.
-    #[arg(long, default_value_t = 3840)]
+    #[arg(long, default_value_t = 1920)]
     width: u32,
 
     /// Image height in pixels.
-    #[arg(long, default_value_t = 2160)]
+    #[arg(long, default_value_t = 1080)]
     height: u32,
 
     /// Real part of the complex number at the center of the view.
-    #[arg(long, allow_hyphen_values = true, default_value_t = -0.743643)]
+    #[arg(long, allow_hyphen_values = true, default_value_t = -0.75)]
     center_re: f64,
 
     /// Imaginary part of the complex number at the center of the view.
-    #[arg(long, allow_hyphen_values = true, default_value_t = 0.131825)]
+    #[arg(long, allow_hyphen_values = true, default_value_t = 0.0)]
     center_im: f64,
 
     /// Half of the smaller extent of the view around the center, in the complex plane.
-    #[arg(long, default_value_t = 0.00006)]
+    #[arg(long, default_value_t = 2.5)]
     scale: f64,
 
     /// Maximum number of iterations before a point is considered inside the set.
-    #[arg(long, default_value_t = 10_000)]
+    #[arg(long, default_value_t = 100)]
     max_iterations: u64,
 
     /// Sampler that places samples within each pixel.
@@ -80,7 +80,7 @@ struct Args {
     filter: FilterKind,
 
     /// Palette that maps iteration values to colors.
-    #[arg(long, value_enum, default_value = "table")]
+    #[arg(long, value_enum, default_value = "rainbow")]
     palette: PaletteKind,
 
     /// TOML file with the color stops for the table palette. If omitted, a built-in default is used.

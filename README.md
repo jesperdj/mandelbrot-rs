@@ -21,24 +21,23 @@ After compiling, run this with:
 
     ./target/release/mandelbrot
 
-By default this does a quick render (one sample per pixel, box filter) to `mandelbrot.png`. Use the
-options to change the view, quality and colors. For a high-quality render of the default view:
+With no arguments this quickly renders the whole Mandelbrot set to `mandelbrot.png`, at 1920x1080
+with one sample per pixel, the box filter and the rainbow palette. Use the options to change the
+view, image size, quality and colors; run `./target/release/mandelbrot --help` to see them all.
 
-    ./target/release/mandelbrot --sampler stratified --samples 16 --filter mitchell
+For a high-quality render, use the stratified sampler and the Mitchell filter, and zoom in on some
+detail. For example, this render of the "seahorse valley" was made with:
 
-Some other examples:
-
-    # A different location and zoom level
-    ./target/release/mandelbrot --center-re -0.75 --center-im 0.0 --scale 2.5 --max-iterations 100
-
-    # A smaller image with a rainbow palette
-    ./target/release/mandelbrot --width 1920 --height 1080 --palette rainbow -o rainbow.png
-
-Run `./target/release/mandelbrot --help` to see every option and its default.
-
-A high-quality render of the default view looks like this:
+    ./target/release/mandelbrot \
+        --center-re -0.743643 --center-im 0.131825 --scale 0.00006 --max-iterations 10000 \
+        --width 3840 --height 2160 --sampler stratified --samples 16 --filter mitchell \
+        --palette table
 
 ![Mandelbrot detail](doc/mandelbrot.png)
+
+For a high-quality render of the whole set at 4K:
+
+    ./target/release/mandelbrot --width 3840 --height 2160 --sampler stratified --samples 16 --filter mitchell -o full.png
 
 ### Palettes
 
