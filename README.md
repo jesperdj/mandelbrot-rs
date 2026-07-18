@@ -49,3 +49,24 @@ own stops in a TOML file with `--palette-file`:
 
 See [`palette.toml`](palette.toml) for the file format: a list of stops, each mapping a normalized
 iteration value (`0.0 ..= 1.0`) to an `#RRGGBB` color, interpolated linearly in between.
+
+### A gallery of interesting places
+
+The Mandelbrot set is self-similar and endlessly detailed. Here are three places worth a look. The
+script [`examples/gallery.sh`](examples/gallery.sh) renders all three at 1920x1080; the individual
+commands are below.
+
+A **mini-Mandelbrot**: a complete miniature copy of the whole set, hidden among the filaments.
+
+    ./target/release/mandelbrot --center-re -0.1592 --center-im 1.0317 --scale 0.02 --max-iterations 1200 \
+        --palette table --sampler stratified --samples 16 --filter mitchell -o minibrot.png
+
+**Seahorse Valley**: interlocking spiral "seahorse tail" shapes between the cardioid and the main bulb.
+
+    ./target/release/mandelbrot --center-re -0.7453 --center-im 0.1127 --scale 0.0055 --max-iterations 1500 \
+        --palette table --sampler stratified --samples 16 --filter mitchell -o seahorse.png
+
+**Elephant Valley**: a parade of spiral "elephant" trunks along the right side of the cardioid.
+
+    ./target/release/mandelbrot --center-re 0.3 --center-im 0.02 --scale 0.02 --max-iterations 800 \
+        --palette table --sampler stratified --samples 16 --filter mitchell -o elephant.png
