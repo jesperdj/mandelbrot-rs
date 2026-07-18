@@ -31,11 +31,21 @@ pub struct StratifiedSampler {
 // ===== StratifiedSampler =====================================================================================================================================
 
 impl StratifiedSampler {
+    /// Creates a stratified sampler that lays out `samples_per_pixel` samples on a square grid
+    /// within the pixel, optionally jittered.
+    ///
+    /// `samples_per_pixel` must be a perfect square (1, 4, 9, 16, ...); the grid is then
+    /// `sqrt(samples_per_pixel)` cells on each side. A non-square count is deliberately not
+    /// supported: it would leave a partial row of cells, which needlessly complicates the sampler.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `samples_per_pixel` is not a perfect square.
     pub fn new(pixel_x: u32, pixel_y: u32, samples_per_pixel: u32, jitter: bool) -> StratifiedSampler {
-        let samples_per_pixel_x = f32::sqrt(samples_per_pixel as f32).round() as u32;
-        let samples_per_pixel_y = samples_per_pixel / samples_per_pixel_x;
+        let side = f32::sqrt(samples_per_pixel as f32).round() as u32;
+        assert_eq!(side * side, samples_per_pixel, "samples_per_pixel must be a perfect square, got {samples_per_pixel}");
 
-        StratifiedSampler { pixel_x, pixel_y, samples_per_pixel_x, samples_per_pixel_y, jitter, index_x: 0, index_y: 0 }
+        StratifiedSampler { pixel_x, pixel_y, samples_per_pixel_x: side, samples_per_pixel_y: side, jitter, index_x: 0, index_y: 0 }
     }
 }
 
