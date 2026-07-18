@@ -18,6 +18,7 @@ use std::time::Instant;
 
 use image::{Rgb, RgbImage};
 use num_complex::Complex64;
+use rayon::prelude::*;
 
 use crate::palette::{Entry, Palette, TablePalette};
 use crate::reconstruction::{Reconstructor, RendererOutput};
@@ -63,10 +64,22 @@ fn main() {
     let filter = MitchellFilter::with_defaults();
     // let filter = BoxFilter::with_defaults();
 
-    let value_to_color = |value| palette.evaluate(value);
+    let value_to_color = |value| match value {
+        Some(value) => palette.evaluate(value),
+        None => Rgb([0, 0, 0]),
+    };
 
     let image = render_image(&sampler_factory, &renderer, &filter, &value_to_color, width, height);
     image.save("mandelbrot.png").unwrap();
+}
+
+/// A rendered sample kept for the reconstruction pass. The offset is the sub-pixel position within
+/// the pixel it was generated in; combined with that pixel's coordinate it gives the sample's
+/// location. Offsets are stored as `f32` to halve the memory footprint of the sample buffer.
+struct StoredSample<R> {
+    offset_x: f32,
+    offset_y: f32,
+    value: R,
 }
 
 fn render_image<SF, S, R, RR, F, M>(sampler_factory: &SF, renderer: &R, filter: &F, value_to_color: &M, width: u32, height: u32) -> RgbImage
@@ -76,16 +89,53 @@ where
     R: Renderer<Output=RR> + Sync,
     RR: RendererOutput,
     F: Filter + Sync,
-    M: Fn(RR) -> Rgb<u8> + Sync,
+    M: Fn(Option<RR>) -> Rgb<u8> + Sync,
 {
     let start_time = Instant::now();
-    let image = RgbImage::from_par_fn(width, height, |x, y| {
-        let sampler = sampler_factory(x, y);
-        let mut reconstructor = Reconstructor::new(filter);
+    let width = width as usize;
+    let height = height as usize;
 
-        for sample in sampler {
-            let value = renderer.render(&sample);
-            reconstructor.accumulate(&sample, value);
+    // Pass 1: generate and render every sample, grouped per pixel. Only samples that produced a
+    // value are kept (samples inside the set produce None), so interior regions store nothing.
+    let samples: Vec<Vec<StoredSample<RR>>> = (0..width * height)
+        .into_par_iter()
+        .map(|index| {
+            let x = (index % width) as u32;
+            let y = (index / width) as u32;
+
+            let mut pixel_samples = Vec::new();
+            for sample in sampler_factory(x, y) {
+                if let Some(value) = renderer.render(&sample) {
+                    let (offset_x, offset_y) = sample.offset();
+                    pixel_samples.push(StoredSample { offset_x: offset_x as f32, offset_y: offset_y as f32, value });
+                }
+            }
+            pixel_samples
+        })
+        .collect();
+
+    // Pass 2: reconstruct each pixel by gathering every sample within the filter's radius. Because
+    // the filter can reach beyond the pixel, samples generated in neighboring pixels contribute
+    // too. Each output pixel is written by exactly one task, so no synchronization is needed.
+    let (radius_x, radius_y) = filter.radius();
+    let image = RgbImage::from_par_fn(width as u32, height as u32, |x, y| {
+        let center_x = x as f64 + 0.5;
+        let center_y = y as f64 + 0.5;
+
+        let x_lo = (center_x - radius_x).floor().max(0.0) as usize;
+        let x_hi = ((center_x + radius_x).floor().max(0.0) as usize).min(width - 1);
+        let y_lo = (center_y - radius_y).floor().max(0.0) as usize;
+        let y_hi = ((center_y + radius_y).floor().max(0.0) as usize).min(height - 1);
+
+        let mut reconstructor = Reconstructor::new(filter);
+        for sy in y_lo..=y_hi {
+            for sx in x_lo..=x_hi {
+                for stored in &samples[sy * width + sx] {
+                    let dx = sx as f64 + stored.offset_x as f64 - center_x;
+                    let dy = sy as f64 + stored.offset_y as f64 - center_y;
+                    reconstructor.accumulate(stored.value, dx, dy);
+                }
+            }
         }
 
         value_to_color(reconstructor.value())

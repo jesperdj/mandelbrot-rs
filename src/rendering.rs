@@ -19,5 +19,7 @@ pub mod mandelbrot;
 pub trait Renderer {
     type Output;
 
-    fn render(&self, sample: &Sample) -> Self::Output;
+    /// Renders a single sample. Returns `None` when the sample has no meaningful value (for the
+    /// Mandelbrot renderer: when the point lies inside the set), so that reconstruction can skip it.
+    fn render(&self, sample: &Sample) -> Option<Self::Output>;
 }

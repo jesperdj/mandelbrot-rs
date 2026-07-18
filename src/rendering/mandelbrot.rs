@@ -49,7 +49,7 @@ impl MandelbrotRenderer {
 impl Renderer for MandelbrotRenderer {
     type Output = f64;
 
-    fn render(&self, sample: &Sample) -> Self::Output {
+    fn render(&self, sample: &Sample) -> Option<Self::Output> {
         let (x, y) = sample.location();
         let c = Complex64::new(self.offset_re + x * self.scale_re, self.offset_im - y * self.scale_im);
 
@@ -62,12 +62,12 @@ impl Renderer for MandelbrotRenderer {
 
         if i >= self.max_iterations {
             // The point did not escape, so it is (assumed to be) inside the set. The smooth
-            // iteration count below is only meaningful for escaped points, so return NaN to mark
-            // this sample as "inside": it propagates through reconstruction and is rendered as the
-            // background color by the palettes (a value outside their range).
-            f64::NAN
+            // iteration count below is only meaningful for escaped points, so report None: the
+            // reconstruction step skips it, and a pixel whose samples are all inside is colored as
+            // the background.
+            None
         } else {
-            (i as f64 - z.norm().log2().log2()) / (self.max_iterations as f64)
+            Some((i as f64 - z.norm().log2().log2()) / (self.max_iterations as f64))
         }
     }
 }

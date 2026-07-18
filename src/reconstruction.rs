@@ -15,11 +15,10 @@
 use std::ops::{AddAssign, Div, Mul};
 
 use crate::reconstruction::filter::Filter;
-use crate::sampling::Sample;
 
 pub mod filter;
 
-pub trait RendererOutput: Copy + Default + AddAssign + Mul<f64, Output=Self> + Div<f64, Output=Self> {}
+pub trait RendererOutput: Copy + Default + AddAssign + Mul<f64, Output=Self> + Div<f64, Output=Self> + Send + Sync {}
 
 pub struct Reconstructor<'a, R, F>
 where
@@ -33,7 +32,7 @@ where
 
 // ===== RendererOutput ========================================================================================================================================
 
-impl<T: Copy + Default + AddAssign + Mul<f64, Output=Self> + Div<f64, Output=Self>> RendererOutput for T {}
+impl<T: Copy + Default + AddAssign + Mul<f64, Output=Self> + Div<f64, Output=Self> + Send + Sync> RendererOutput for T {}
 
 // ===== Reconstructor =========================================================================================================================================
 
@@ -47,16 +46,21 @@ where
         Reconstructor { accumulator: R::default(), total_weight: 0.0, filter }
     }
 
+    /// Accumulates a sample value with a weight determined by the reconstruction filter. `dx` and
+    /// `dy` are the sample's offset from the center of the pixel being reconstructed, measured in
+    /// pixels; the sample may originate from a neighboring pixel, so they are not restricted to
+    /// `[-0.5, 0.5]`.
     #[inline]
-    pub fn accumulate(&mut self, sample: &Sample, value: R) {
-        let (offset_x, offset_y) = sample.offset();
-        let weight = self.filter.evaluate(offset_x - 0.5, offset_y - 0.5);
+    pub fn accumulate(&mut self, value: R, dx: f64, dy: f64) {
+        let weight = self.filter.evaluate(dx, dy);
         self.accumulator += value * weight;
         self.total_weight += weight;
     }
 
+    /// Returns the filtered value, or `None` when no sample contributed any weight (for the
+    /// Mandelbrot renderer this means every nearby sample was inside the set).
     #[inline]
-    pub fn value(self) -> R {
-        if self.total_weight != 0.0 { self.accumulator / self.total_weight } else { R::default() }
+    pub fn value(self) -> Option<R> {
+        if self.total_weight != 0.0 { Some(self.accumulator / self.total_weight) } else { None }
     }
 }

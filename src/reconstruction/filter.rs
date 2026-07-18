@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// TODO: Radius van filter wordt helemaal niet gebruikt.
-
 pub trait Filter {
+    /// The radius of the filter's support in pixels, along the x and y axes. Reconstruction uses
+    /// this to decide which samples around a pixel can contribute to it.
     fn radius(&self) -> (f64, f64);
 
     fn evaluate(&self, x: f64, y: f64) -> f64;
