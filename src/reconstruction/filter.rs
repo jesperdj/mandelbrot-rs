@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// TODO: Radius van filter wordt helemaal niet gebruikt.
+
 pub trait Filter {
     fn radius(&self) -> (f64, f64);
 
@@ -52,7 +54,7 @@ impl Filter for BoxFilter {
 
     #[inline]
     fn evaluate(&self, x: f64, y: f64) -> f64 {
-        if x.abs() <= self.radius_x && y <= self.radius_y { 1.0 } else { 0.0 }
+        if x.abs() <= self.radius_x && y.abs() <= self.radius_y { 1.0 } else { 0.0 }
     }
 }
 

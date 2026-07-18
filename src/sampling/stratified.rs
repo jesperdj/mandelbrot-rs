@@ -65,7 +65,7 @@ impl Iterator for StratifiedSampler {
         if self.index_y < self.samples_per_pixel_y {
             let remaining_y = (self.samples_per_pixel_y - self.index_y - 1) as usize;
             let remaining_x = (self.samples_per_pixel_x - self.index_x) as usize;
-            let remaining = remaining_y * self.samples_per_pixel_y as usize + remaining_x;
+            let remaining = remaining_y * self.samples_per_pixel_x as usize + remaining_x;
 
             (remaining, Some(remaining))
         } else {

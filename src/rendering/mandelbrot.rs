@@ -60,6 +60,14 @@ impl Renderer for MandelbrotRenderer {
             i += 1;
         }
 
-        (i as f64 - z.norm().log2().log2()) / (self.max_iterations as f64)
+        if i >= self.max_iterations {
+            // The point did not escape, so it is (assumed to be) inside the set. The smooth
+            // iteration count below is only meaningful for escaped points, so return NaN to mark
+            // this sample as "inside": it propagates through reconstruction and is rendered as the
+            // background color by the palettes (a value outside their range).
+            f64::NAN
+        } else {
+            (i as f64 - z.norm().log2().log2()) / (self.max_iterations as f64)
+        }
     }
 }

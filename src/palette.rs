@@ -46,7 +46,7 @@ pub struct TablePalette {
 
 impl Grayscale {
     pub fn new(range: Range<f64>) -> Grayscale {
-        let scale = (range.end - range.start) * 255.0;
+        let scale = 255.0 / (range.end - range.start);
 
         Grayscale { range, scale }
     }
