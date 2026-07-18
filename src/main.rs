@@ -118,7 +118,10 @@ where
     // the filter can reach beyond the pixel, samples generated in neighboring pixels contribute
     // too. Each output pixel is written by exactly one task, so no synchronization is needed.
     let (radius_x, radius_y) = filter.radius();
-    let image = RgbImage::from_par_fn(width as u32, height as u32, |x, y| {
+    let mut raw = vec![0u8; width * height * 3];
+    raw.par_chunks_exact_mut(3).enumerate().for_each(|(index, pixel)| {
+        let x = index % width;
+        let y = index / width;
         let center_x = x as f64 + 0.5;
         let center_y = y as f64 + 0.5;
 
@@ -138,8 +141,10 @@ where
             }
         }
 
-        value_to_color(reconstructor.value())
+        pixel.copy_from_slice(&value_to_color(reconstructor.value()).0);
     });
+    let image = RgbImage::from_raw(width as u32, height as u32, raw).expect("raw buffer has the right size");
+
     let duration = Instant::now().duration_since(start_time).as_millis();
     println!("Rendering time: {} ms", duration);
 
