@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use num_complex::Complex64;
+use num_traits::Zero;
 
 use crate::rendering::Renderer;
 use crate::sampling::Sample;
@@ -52,7 +53,7 @@ impl Renderer for MandelbrotRenderer {
         let (x, y) = sample.location();
         let c = Complex64::new(self.offset_re + x * self.scale_re, self.offset_im - y * self.scale_im);
 
-        let mut z = Complex64::new(0.0, 0.0);
+        let mut z = Complex64::zero();
         let mut i = 0u64;
         while z.norm_sqr() <= 4.0 && i < self.max_iterations {
             z = z * z + c;

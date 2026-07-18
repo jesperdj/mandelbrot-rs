@@ -43,7 +43,7 @@ where
     F: Filter,
 {
     #[inline]
-    pub fn new(filter: &'a F) -> Reconstructor<R, F> {
+    pub fn new(filter: &'a F) -> Reconstructor<'a, R, F> {
         Reconstructor { accumulator: R::default(), total_weight: 0.0, filter }
     }
 
