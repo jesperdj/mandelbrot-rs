@@ -1,0 +1,18 @@
+# Example color stops for the table palette. Use it with:
+#
+#     mandelbrot --palette table --palette-file palette.toml
+#
+# Each stop maps a normalized iteration value (0.0 ..= 1.0) to an #RRGGBB color.
+# Colors are interpolated linearly between consecutive stops. Stops may be listed
+# in any order; they are sorted by value.
+
+stops = [
+    { value = 0.000, color = "#000066" },
+    { value = 0.010, color = "#191919" },
+    { value = 0.018, color = "#FFFF4C" },
+    { value = 0.022, color = "#006600" },
+    { value = 0.040, color = "#FFFFFF" },
+    { value = 0.200, color = "#000099" },
+    { value = 0.500, color = "#000000" },
+    { value = 1.000, color = "#FFFFFF" },
+]

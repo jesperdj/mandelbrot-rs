@@ -10,11 +10,14 @@ repository = "https://github.com/jesperdj/mandelbrot-rs"
 license-file = "LICENSE"
 
 [dependencies]
-image = { version = "0.25.2", default-features = false, features = ["png", "rayon"] }
+clap = { version = "4.6.2", features = ["derive"] }
+image = { version = "0.25.10", default-features = false, features = ["png", "rayon"] }
 num-complex = "0.4.6"
 num-traits = "0.2.19"
 rand = "0.10.2"
-rayon = "1.10.0"
+rayon = "1.12.0"
+serde = { version = "1.0.228", features = ["derive"] }
+toml = "1.1.3"
 
 [profile.release]
 lto = "thin"
