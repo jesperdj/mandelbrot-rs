@@ -248,12 +248,12 @@ where
     F: Filter + Sync,
     M: Fn(Option<RR>) -> Rgb<u8> + Sync,
 {
-    let start_time = Instant::now();
     let width = width as usize;
     let height = height as usize;
 
     // Pass 1: generate and render every sample, grouped per pixel. Only samples that produced a
     // value are kept (samples inside the set produce None), so interior regions store nothing.
+    let start_time_pass_1 = Instant::now();
     let samples: Vec<Vec<StoredSample<RR>>> = (0..width * height)
         .into_par_iter()
         .map(|index| {
@@ -270,10 +270,12 @@ where
             pixel_samples
         })
         .collect();
+    println!("Pass 1 (sampling and rendering): {} ms", Instant::now().duration_since(start_time_pass_1).as_millis());
 
     // Pass 2: reconstruct each pixel by gathering every sample within the filter's radius. Because
     // the filter can reach beyond the pixel, samples generated in neighboring pixels contribute
     // too. Each output pixel is written by exactly one task, so no synchronization is needed.
+    let start_time_pass_2 = Instant::now();
     let (radius_x, radius_y) = filter.radius();
     let image = RgbImage::from_par_fn(width as u32, height as u32, |x, y| {
         let center_x = x as f64 + 0.5;
@@ -297,8 +299,8 @@ where
 
         value_to_color(reconstructor.value())
     });
-    let duration = Instant::now().duration_since(start_time).as_millis();
-    println!("Rendering time: {} ms", duration);
+    println!("Pass 2 (reconstruction): {} ms", Instant::now().duration_since(start_time_pass_2).as_millis());
+    println!("Total time: {} ms", Instant::now().duration_since(start_time_pass_1).as_millis());
 
     image
 }
